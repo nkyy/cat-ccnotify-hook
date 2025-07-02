@@ -1,0 +1,56 @@
+{
+  "name": "cat-ccnotify-hook",
+  "version": "0.1.0",
+  "description": "Enhanced Claude Code notification hooks with cat sounds and better styling",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "install-hooks": "node scripts/install-hooks.js",
+    "uninstall-hooks": "node scripts/uninstall-hooks.js",
+    "test": "node scripts/test-hooks.js"
+  },
+  "bin": {
+    "cat-ccnotify-install": "./scripts/install-hooks.js",
+    "cat-ccnotify-uninstall": "./scripts/uninstall-hooks.js",
+    "cat-ccnotify-test": "./scripts/test-hooks.js"
+  },
+  "keywords": [
+    "claude-code",
+    "notifications",
+    "hooks",
+    "cat",
+    "sounds",
+    "macos",
+    "developer-tools"
+  ],
+  "author": "ccnotify team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/cat-ccnotify-hook.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/cat-ccnotify-hook/issues"
+  },
+  "homepage": "https://github.com/your-username/cat-ccnotify-hook#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "os": [
+    "darwin"
+  ],
+  "files": [
+    "hooks/*.js",
+    "hooks/*.cjs",
+    "sounds/",
+    "scripts/",
+    "index.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "dependencies": {},
+  "devDependencies": {},
+  "peerDependencies": {
+    "@anthropic-ai/claude-code": "*"
+  }
+}
