@@ -2,15 +2,16 @@
 
 /**
  * cat-ccnotify-hook uninstaller
- * Removes enhanced Claude Code notification hooks
+ * Removes cat notification hooks from Claude Code settings
  */
 
 import { writeFileSync, readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { homedir } from 'os';
 
+// Claude Code settings configuration path
 const claudeConfigDir = join(homedir(), '.claude');
-const hooksConfigPath = join(claudeConfigDir, 'hooks.json');
+const settingsPath = join(claudeConfigDir, 'settings.json');
 
 function log(message) {
   console.log(`🐱 ${message}`);
@@ -24,17 +25,17 @@ function success(message) {
   console.log(`✅ ${message}`);
 }
 
-function getCurrentHooksConfig() {
-  if (!existsSync(hooksConfigPath)) {
-    return {};
+function getCurrentSettings() {
+  if (!existsSync(settingsPath)) {
+    return null;
   }
   
   try {
-    const configContent = readFileSync(hooksConfigPath, 'utf-8');
-    return JSON.parse(configContent);
+    const settingsContent = readFileSync(settingsPath, 'utf-8');
+    return JSON.parse(settingsContent);
   } catch (err) {
-    log(`Warning: Could not parse existing hooks config: ${err.message}`);
-    return {};
+    error(`Could not parse settings file: ${err.message}`);
+    return null;
   }
 }
 
@@ -42,25 +43,84 @@ function uninstallHooks() {
   try {
     log('Uninstalling cat-ccnotify-hook...');
     
-    if (!existsSync(hooksConfigPath)) {
-      log('No hooks configuration found. Nothing to uninstall.');
+    // Get current settings
+    const currentSettings = getCurrentSettings();
+    
+    if (!currentSettings) {
+      log('No settings.json found. Nothing to uninstall.');
       return;
     }
     
-    // Get current hooks configuration
-    const currentConfig = getCurrentHooksConfig();
+    if (!currentSettings.hooks) {
+      log('No hooks configured. Nothing to uninstall.');
+      return;
+    }
     
-    // Remove cat-ccnotify hooks
-    const newConfig = { ...currentConfig };
-    delete newConfig.notification;
-    delete newConfig.stop;
+    // Check if our hooks were installed
+    const { Notification, Stop } = currentSettings.hooks;
     
-    // Write updated configuration
-    writeFileSync(hooksConfigPath, JSON.stringify(newConfig, null, 2));
+    const hadNotificationHook = Notification && Notification.some(hookGroup => 
+      hookGroup.hooks && hookGroup.hooks.some(hook => 
+        hook.command && hook.command.includes('notification-hook.js')
+      )
+    );
+    const hadStopHook = Stop && Stop.some(hookGroup => 
+      hookGroup.hooks && hookGroup.hooks.some(hook => 
+        hook.command && hook.command.includes('stop-hook.cjs')
+      )
+    );
+    
+    if (!hadNotificationHook && !hadStopHook) {
+      log('Cat notification hooks not found. Nothing to uninstall.');
+      return;
+    }
+    
+    // Create new settings without cat hooks
+    const newSettings = { ...currentSettings };
+    
+    if (newSettings.hooks) {
+      // Remove cat notification hooks
+      if (newSettings.hooks.Notification) {
+        newSettings.hooks.Notification = newSettings.hooks.Notification.filter(hookGroup => 
+          !hookGroup.hooks.some(hook => 
+            hook.command && hook.command.includes('notification-hook.js')
+          )
+        );
+        
+        if (newSettings.hooks.Notification.length === 0) {
+          delete newSettings.hooks.Notification;
+        }
+      }
+      
+      // Remove cat stop hooks
+      if (newSettings.hooks.Stop) {
+        newSettings.hooks.Stop = newSettings.hooks.Stop.filter(hookGroup => 
+          !hookGroup.hooks.some(hook => 
+            hook.command && hook.command.includes('stop-hook.cjs')
+          )
+        );
+        
+        if (newSettings.hooks.Stop.length === 0) {
+          delete newSettings.hooks.Stop;
+        }
+      }
+      
+      // Remove empty hooks object
+      if (Object.keys(newSettings.hooks).length === 0) {
+        delete newSettings.hooks;
+      }
+    }
+    
+    // Write updated settings
+    writeFileSync(settingsPath, JSON.stringify(newSettings, null, 2));
     
     success('Cat notification hooks uninstalled successfully!');
-    log(`Configuration updated: ${hooksConfigPath}`);
-    log('Your Claude Code will now use default notifications.');
+    log('Claude Code will now use default notifications.');
+    log('');
+    log('😿 We\'ll miss the meows!');
+    log('');
+    log('To reinstall later, run:');
+    log('  cat-ccnotify-install');
     
   } catch (err) {
     error(`Uninstallation failed: ${err.message}`);
@@ -70,13 +130,18 @@ function uninstallHooks() {
 
 function main() {
   console.log('🐱 cat-ccnotify-hook uninstaller');
-  console.log('==================================');
+  console.log('=================================');
   
   uninstallHooks();
 }
 
 // Run if called directly
 if (import.meta.url === `file://${process.argv[1]}`) {
+  main();
+}
+
+// Also run if invoked as global binary
+if (process.argv[1].endsWith('cat-ccnotify-uninstall')) {
   main();
 }
 

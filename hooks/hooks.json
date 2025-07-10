@@ -1,0 +1,4 @@
+{
+  "notification": "./hooks/notification-hook.js",
+  "stop": "./hooks/stop-hook.cjs"
+}

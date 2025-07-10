@@ -1,0 +1,121 @@
+#!/usr/bin/env node
+
+/**
+ * cat-notify - Simple notification tester
+ * Sends a test notification with cat sound
+ */
+
+import { execSync, spawn } from 'child_process';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const packageRoot = join(__dirname, '..');
+
+function playNotificationSound() {
+  const soundPath = join(packageRoot, 'sounds', 'cat-meow-1-fx-323465.mp3');
+  try {
+    execSync(`afplay "${soundPath}"`, { stdio: 'ignore' });
+  } catch (err) {
+    console.warn('Could not play sound:', err.message);
+  }
+}
+
+function showNotification(title, message) {
+  const escapedTitle = title.replace(/'/g, "'\"'\"'");
+  const escapedMessage = message.replace(/'/g, "'\"'\"'");
+  
+  try {
+    execSync(`osascript -e 'display notification "${escapedMessage}" with title "${escapedTitle}"'`, { stdio: 'ignore' });
+  } catch (err) {
+    console.warn('Could not show notification:', err.message);
+  }
+}
+
+function main() {
+  const args = process.argv.slice(2);
+  
+  // Check for hook test modes
+  if (args.includes('--hook-test') || args.includes('--notification-hook')) {
+    testNotificationHook();
+    return;
+  }
+  
+  if (args.includes('--stop-hook')) {
+    testStopHook();
+    return;
+  }
+  
+  let title = '🐱 Cat Notify Test';
+  let message = 'This is a test notification with cat sound! 🎵';
+  
+  // Parse simple arguments
+  if (args.length >= 1 && !args[0].startsWith('--')) {
+    title = args[0];
+  }
+  if (args.length >= 2 && !args[1].startsWith('--')) {
+    message = args[1];
+  }
+  
+  console.log(`🐱 Sending notification: "${title}" - "${message}"`);
+  
+  // Show notification
+  showNotification(title, message);
+  
+  // Play cat sound
+  setTimeout(() => {
+    playNotificationSound();
+  }, 500); // Small delay to let notification show first
+  
+  console.log('✅ Notification sent!');
+}
+
+function testNotificationHook() {
+  const notificationHookPath = join(packageRoot, 'hooks', 'notification-hook.js');
+  
+  console.log('🧪 Testing notification hook with sample data...');
+  
+  const testData = {
+    title: "🧪 Test Notification",
+    message: "Testing Claude Code notification hook with cat sounds!"
+  };
+  
+  const hook = spawn('node', [notificationHookPath], {
+    stdio: ['pipe', 'inherit', 'inherit']
+  });
+  
+  hook.stdin.write(JSON.stringify(testData));
+  hook.stdin.end();
+  
+  hook.on('close', (code) => {
+    console.log(`✅ Notification hook test completed (exit code: ${code})`);
+  });
+}
+
+function testStopHook() {
+  const stopHookPath = join(packageRoot, 'hooks', 'stop-hook.cjs');
+  
+  console.log('🧪 Testing stop hook with sample data...');
+  
+  const testData = {
+    session_id: "test-session-123",
+    transcript_path: "/tmp/test-conversation.jsonl",
+    stop_hook_active: false,
+    title: "Test Session",
+    message: "Session ended for testing"
+  };
+  
+  const hook = spawn('node', [stopHookPath], {
+    stdio: ['pipe', 'inherit', 'inherit']
+  });
+  
+  hook.stdin.write(JSON.stringify(testData));
+  hook.stdin.end();
+  
+  hook.on('close', (code) => {
+    console.log(`✅ Stop hook test completed (exit code: ${code})`);
+  });
+}
+
+// Run if called directly
+main();

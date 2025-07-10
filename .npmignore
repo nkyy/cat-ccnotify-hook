@@ -1,0 +1,49 @@
+# Test files
+test/
+*.test.js
+jest.config.js
+coverage/
+
+# Development and debug files
+debug-*.js
+investigate-*.js
+simulate-*.sh
+temp-*/
+
+# Development files
+.git/
+.gitignore
+.DS_Store
+
+# Debug logs
+*.log
+.claude/
+
+# Local configuration
+.env
+.env.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Documentation source files
+docs/
+*.md
+!README.md
+!LICENSE
+
+# CI/CD
+.github/
+.travis.yml
+.gitlab-ci.yml
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# npm pack files
+*.tgz

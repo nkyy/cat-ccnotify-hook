@@ -1,15 +1,21 @@
 {
   "name": "cat-ccnotify-hook",
-  "version": "0.1.0",
-  "description": "Enhanced Claude Code notification hooks with cat sounds and better styling",
+  "version": "0.2.0",
+  "description": "Enhanced Claude Code notification hooks with cat sounds and better styling - replaces claude-code-notify-mcp",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "install-hooks": "node scripts/install-hooks.js",
-    "uninstall-hooks": "node scripts/uninstall-hooks.js",
-    "test": "node scripts/test-hooks.js"
+    "install-hooks": "node ./scripts/install-hooks.js",
+    "uninstall-hooks": "node ./scripts/uninstall-hooks.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:unit": "node --experimental-vm-modules node_modules/jest/bin/jest.js test/unit",
+    "test:e2e": "node --experimental-vm-modules node_modules/jest/bin/jest.js test/e2e",
+    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "test:hooks": "node ./scripts/test-hooks.js"
   },
   "bin": {
+    "cat-notify": "./bin/cat-notify",
     "cat-ccnotify-install": "./scripts/install-hooks.js",
     "cat-ccnotify-uninstall": "./scripts/uninstall-hooks.js",
     "cat-ccnotify-test": "./scripts/test-hooks.js"
@@ -21,18 +27,20 @@
     "cat",
     "sounds",
     "macos",
-    "developer-tools"
+    "developer-tools",
+    "replacement",
+    "claude-code-notify-mcp"
   ],
   "author": "ccnotify team",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/cat-ccnotify-hook.git"
+    "url": "git+https://github.com/cat-ccnotify/cat-ccnotify-hook.git"
   },
   "bugs": {
-    "url": "https://github.com/your-username/cat-ccnotify-hook/issues"
+    "url": "https://github.com/cat-ccnotify/cat-ccnotify-hook/issues"
   },
-  "homepage": "https://github.com/your-username/cat-ccnotify-hook#readme",
+  "homepage": "https://github.com/cat-ccnotify/cat-ccnotify-hook#readme",
   "engines": {
     "node": ">=16.0.0"
   },
@@ -40,17 +48,25 @@
     "darwin"
   ],
   "files": [
+    "bin/",
     "hooks/*.js",
     "hooks/*.cjs",
+    "hooks/*.json",
+    "lib/",
     "sounds/",
     "scripts/",
     "index.js",
     "README.md",
     "LICENSE"
   ],
-  "dependencies": {},
-  "devDependencies": {},
+  "devDependencies": {
+    "@jest/globals": "^30.0.4",
+    "jest": "^30.0.4"
+  },
   "peerDependencies": {
     "@anthropic-ai/claude-code": "*"
+  },
+  "dependencies": {
+    "node-notifier": "^10.0.1"
   }
 }
