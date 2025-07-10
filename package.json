@@ -15,10 +15,10 @@
     "test:hooks": "node ./scripts/test-hooks.js"
   },
   "bin": {
-    "cat-notify": "./bin/cat-notify",
-    "cat-ccnotify-install": "./scripts/install-hooks.js",
-    "cat-ccnotify-uninstall": "./scripts/uninstall-hooks.js",
-    "cat-ccnotify-test": "./scripts/test-hooks.js"
+    "cat-notify": "bin/cat-notify",
+    "cat-ccnotify-install": "scripts/install-hooks.js",
+    "cat-ccnotify-uninstall": "scripts/uninstall-hooks.js",
+    "cat-ccnotify-test": "scripts/test-hooks.js"
   },
   "keywords": [
     "claude-code",
